@@ -6,11 +6,13 @@ import com.broker.user_service.DTOs.RegisterRequest;
 import com.broker.user_service.DTOs.UserDTO;
 import com.broker.user_service.Service.UserService;
 import com.broker.user_service.model.User;
+import com.broker.user_service.model.UserPermission;
 import com.broker.user_service.model.UserProfile;
 import com.broker.user_service.repository.UserPermissionRepository;
 import com.broker.user_service.repository.UserProfileRepository;
 import com.broker.user_service.repository.UserRepository;
 import com.broker.user_service.security.JwtTokenProvider;
+import com.broker.user_service.utils.ProductPermission;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +24,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -79,12 +82,15 @@ public class AuthController {
             String username = jwtTokenProvider.getUsernameFromToken(token);
             Optional<User> user = userRepository.findByUsername(username);
             Boolean hasPersonalData  = user.get().isHasPersonalData();
+            List<UserPermission> userPermissions = userPermissionRepository.findByUserId(userId);
+            List<ProductPermission> permissions = userPermissions.stream()
+                    .map(UserPermission::getPermission)
+                    .toList();
 
             UserProfile profile = userProfileRepository.findByUserId(userId)
                     .orElse(null); // si aún no completó profile
             String fullName = profile != null ? profile.getFullName() : null;
-            UserProfile.UserLevel userLevel = profile != null ? profile.getUserLevel()  : null;
-            return ResponseEntity.ok(new JwtResponse(token, username, userId, hasPersonalData, fullName, userLevel ));
+            return ResponseEntity.ok(new JwtResponse(token, username, userId, hasPersonalData, fullName, permissions));
 
         } catch (AuthenticationException ex) {
             Map<String, String> error = new HashMap<>();
@@ -92,4 +98,5 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
         }
     }
+
 }
