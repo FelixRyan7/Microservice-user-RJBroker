@@ -1,6 +1,11 @@
 package com.broker.user_service.DTOs;
 
+import com.broker.user_service.model.User;
+import com.broker.user_service.model.UserPermission;
 import com.broker.user_service.model.UserProfile;
+import com.broker.user_service.utils.ProductPermission;
+
+import java.util.List;
 
 public class JwtResponse {
 
@@ -9,19 +14,20 @@ public class JwtResponse {
     private Long userId;
     private Boolean hasPersonalData;
     private String fullName;
-    private UserProfile.UserLevel userLevel;
+    private List<ProductPermission> permissions;
 
     // Constructor
 
 
-    public JwtResponse(String token, String username, Long userId, Boolean hasPersonalData, String fullName, UserProfile.UserLevel userLevel) {
+    public JwtResponse(String token, String username, Long userId, Boolean hasPersonalData, String fullName, List<ProductPermission> permissions) {
         this.token = token;
         this.username = username;
         this.userId = userId;
         this.hasPersonalData = hasPersonalData;
         this.fullName = fullName;
-        this.userLevel = userLevel;
+        this.permissions = permissions;
     }
+
 
     // Getters y Setters
     public String getToken() {
@@ -60,15 +66,17 @@ public class JwtResponse {
         return fullName;
     }
 
+    public List<ProductPermission> getPermissions() {
+        return permissions;
+    }
+
+    public void setPermissions(List<ProductPermission> permissions) {
+        this.permissions = permissions;
+    }
+
     public void setFullName(String fullName) {
         this.fullName = fullName;
     }
 
-    public UserProfile.UserLevel getUserLevel() {
-        return userLevel;
-    }
 
-    public void setUserLevel(UserProfile.UserLevel userLevel) {
-        this.userLevel = userLevel;
-    }
 }

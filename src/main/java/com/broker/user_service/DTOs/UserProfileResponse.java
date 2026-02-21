@@ -7,12 +7,10 @@ public class UserProfileResponse {
     private Long id;
     private String fullName;
 
-    private UserProfile.UserLevel userLevel;
 
-    public UserProfileResponse(Long id, String fullName, UserProfile.UserLevel userLevel) {
+    public UserProfileResponse(Long id, String fullName) {
         this.id = id;
         this.fullName = fullName;
-        this.userLevel = userLevel;
     }
 
     public Long getId() {
@@ -31,11 +29,5 @@ public class UserProfileResponse {
         this.fullName = fullName;
     }
 
-    public UserProfile.UserLevel getUserLevel() {
-        return userLevel;
-    }
 
-    public void setUserLevel(UserProfile.UserLevel userLevel) {
-        this.userLevel = userLevel;
-    }
 }
