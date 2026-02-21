@@ -23,10 +23,5 @@ public class UserProfileController {
                 userProfileService.createProfile(request)
         );
     }
-    @GetMapping("/prueba")
-    public ResponseEntity prueba (){
-        return ResponseEntity.ok("funciona")
-                ;
-    }
 
 }
