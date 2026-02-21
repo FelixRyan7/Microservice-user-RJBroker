@@ -2,6 +2,7 @@ package com.broker.user_service.security;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
@@ -15,7 +16,8 @@ import java.util.stream.Collectors;
 public class JwtTokenProvider {
 
     // Clave secreta para firmar el JWT
-    private final Key jwtSecret = Keys.secretKeyFor(SignatureAlgorithm.HS512);  // Cambiar esto por una variable de entorno o archivo de configuración
+    @Value("${jwt.secret}")
+    private String jwtSecret;  // Cambiar esto por una variable de entorno o archivo de configuración
 
     // Tiempo de expiración del JWT (1 hora)
     private final long jwtExpirationMs = 6000000; // 20 minutos
@@ -40,14 +42,14 @@ public class JwtTokenProvider {
                 .claim("permissions", permissions)
                 .setIssuedAt(new Date())  // Fecha de emisión
                 .setExpiration(new Date(new Date().getTime() + jwtExpirationMs))  // Fecha de expiración
-                .signWith(SignatureAlgorithm.HS512, jwtSecret)  // Firma con algoritmo HS512
+                .signWith(SignatureAlgorithm.HS512, jwtSecret.getBytes())  // Firma con algoritmo HS512
                 .compact();
     }
 
     // Método para validar el token
     public boolean validateToken(String token) {
         try {
-            Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token);  // Verificar la firma y la validez
+            Jwts.parser().setSigningKey(jwtSecret.getBytes()).parseClaimsJws(token);  // Verificar la firma y la validez
             return true;
         } catch (JwtException | IllegalArgumentException e) {
             return false;  // Si el token es inválido o expiró
@@ -56,7 +58,7 @@ public class JwtTokenProvider {
 
     public Long getUserIdFromToken(String token) {
         Claims claims = Jwts.parser()
-                .setSigningKey(jwtSecret)
+                .setSigningKey(jwtSecret.getBytes())
                 .parseClaimsJws(token)
                 .getBody();
 
@@ -66,14 +68,14 @@ public class JwtTokenProvider {
     // Método para obtener el nombre de usuario desde el token
     public String getUsernameFromToken(String token) {
         return Jwts.parser()
-                .setSigningKey(jwtSecret)
+                .setSigningKey(jwtSecret.getBytes())
                 .parseClaimsJws(token)
                 .getBody()
                 .getSubject();  // Extrae el "subject" del token, que es el nombre de usuario
     }
     public List<String> getRolesFromToken(String token) {
         Claims claims = Jwts.parser()
-                .setSigningKey(jwtSecret)
+                .setSigningKey(jwtSecret.getBytes())
                 .parseClaimsJws(token)
                 .getBody();
 
@@ -82,7 +84,7 @@ public class JwtTokenProvider {
 
     public List<String> getPermissionsFromToken(String token) {
         Claims claims = Jwts.parser()
-                .setSigningKey(jwtSecret)
+                .setSigningKey(jwtSecret.getBytes())
                 .parseClaimsJws(token)
                 .getBody();
 
